@@ -51,10 +51,12 @@ record.json is the template for generating recordings
 * enabled: if this recording is enabled or not
 
 ## starting
-clone it ```git clone https://github.com/avcsa/tomato.git```
-cd into it ```cd tomato```
-install dependencies ```npm install```
-run it ```node app.js```
+```bash
+git clone https://github.com/avcsa/tomato.git
+cd tomato
+npm install
+node app.js
+```
 
 ## gui
 * on the server, enter http://localhost:4200 (or whatever port you choose in config) and you will find the gui
