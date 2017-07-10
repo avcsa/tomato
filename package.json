@@ -2,11 +2,11 @@
     "name": "tomato",
     "version": "1.0.0",
     "keywords": [
-        "util",
-        "functional",
-        "server",
-        "client",
-        "browser"
+        "mpegts",
+        "stream",
+        "tv",
+        "recorder",
+        "tomato"
     ],
     "author": "jmrunge",
     "contributors": [],
