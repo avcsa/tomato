@@ -1,0 +1,8 @@
+{
+    "port"           : "4200",
+    "ipv4_address"   : "192.168.10.96",
+    "rec_dir"        : "./recordings",
+    "watch_interval" : 60000,
+    "rec_timeout"    : 5000000,
+    "autostart"      : false
+}

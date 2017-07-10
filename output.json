@@ -1,0 +1,1 @@
+{"address":"224.224.224.224","port":"1234","muxrate":"5120000","bufsize":"917504","vb":"3500k","ab":"160k","minrate":"1000k","maxrate":"4500k","vcodec":"mpeg4","acodec":"ac3","g":"15","bf":"2","threads":"2","real_time":"1","crf":"18"}

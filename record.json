@@ -1,0 +1,7 @@
+{
+    "prefix" : "low_",
+    "format" : ["mp4", "ts"], 
+    "bitrate": "1M",
+    "maxsize": "100M",
+    "enabled": ["no", "yes"]
+}

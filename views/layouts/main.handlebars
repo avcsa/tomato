@@ -1,0 +1,142 @@
+<!doctype html>  
+<html lang="en">  
+    <head>
+        <link rel="apple-touch-icon" sizes="57x57" href="/static/img/favicon/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="/static/img/favicon/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="/static/img/favicon/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="/static/img/favicon/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="/static/img/favicon/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="/static/img/favicon/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="/static/img/favicon/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="/static/img/favicon/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/img/favicon/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192"  href="/static/img/favicon/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicon/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon/favicon-16x16.png">
+        <link rel="manifest" href="/static/img/favicon/manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/static/img/favicon/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+        
+        <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.css" media="screen" charset="utf-8">
+        <link rel="stylesheet" href="/font-awesome/css/font-awesome.css" media="screen" charset="utf-8">
+        <script src="/jquery/dist/jquery.js" charset="utf-8"></script>
+        <script src="/tether/dist/js/tether.js" charset="utf-8"></script>
+        <script src="/bootstrap/dist/js/bootstrap.js" charset="utf-8"></script>
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="row">
+            <div class="col-lg-9">
+                <img src="/static/img/tomatologo.png" style="max-width:50%; max-height:50%;"/>
+            </div>
+            <div class="col-lg-2" >
+                {{#if status.running}}
+                    <div class="card card-inverse card-success mb-3 text-center" id="status">
+                        <div class="card-block">
+                            <blockquote class="card-blockquote" id="status-text">
+                                Running
+                            </blockquote>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="card card-inverse card-danger mb-3 text-center" id="status">
+                        <div class="card-block">
+                            <blockquote class="card-blockquote" id="status-text">
+                                Stopped
+                            </blockquote>
+                        </div>
+                    </div>
+                {{/if}}
+            </div>
+        </div>
+        <div class="container">
+            {{{body}}}
+        </div>
+    </body>
+</html>
+
+<script>
+    var server = "{{status.server}}";
+    var running = false;
+    var socket = io.connect(server);
+    socket.on('connect', function() {
+        socket.emit('join', 'Client joined');
+    });
+    socket.on('init', function(status) {
+        running = status.running;
+    });
+    socket.on('statusChanged', function(status) {
+        running = status.running;
+        if (running) {
+            $("#status").removeClass("card-danger");
+            $("#status").addClass("card-success");
+            $("#status-text").text("Running");
+        } else {
+            $("#status").removeClass("card-success");
+            $("#status").addClass("card-danger");
+            $("#status-text").text("Stopped");
+        }
+    });
+    socket.on('fps', function(fps) {
+        $("#status-text").text("Running (" + fps + " fps)");
+    });
+    socket.on('dataChanged', function(data) {
+        updateData(data);
+    });
+    socket.on('newRecording', function(data) {
+        showNewRecord(data);
+    });
+    $("#status").click(function() {
+        if (!running)
+            socket.emit("startPlaying");
+        else
+            socket.emit("stopPlaying");
+    });
+    function updateValue(type, item, valor, uuid) {
+        var obj = { "type": type, "item": item, "valor": valor, "uuid": uuid };
+        socket.emit("updateValue", obj);
+    };
+    function createNewRecording() {
+        socket.emit("createNewRecording");
+    };
+    function deleteRecording(uuid) {
+        socket.emit("deleteRecording", uuid);
+    };
+    function deleteRecordingFile(filename) {
+        socket.emit("removeRecordingFile", filename);
+    };
+    socket.on('recStatusChanged', function(status) {
+        if (status.running) {
+            $("#rec-status-" + status.uuid).removeClass("card-danger");
+            $("#rec-status-" + status.uuid).addClass("card-success");
+            $("#rec-status-text-" + status.uuid).text("Running");
+        } else {
+            $("#rec-status-" + status.uuid).removeClass("card-success");
+            $("#rec-status-" + status.uuid).addClass("card-danger");
+            $("#rec-status-text-" + status.uuid).text("Stopped");
+        }
+    });
+    socket.on('recRunning', function(uuid) {
+        console.log(uuid);
+        $("#rec-ok-" + uuid).removeClass("fa-times-circle-o");
+        $("#rec-ok-" + uuid).addClass("fa-check-circle-o");
+    });
+    socket.on('recStopped', function(uuid) {
+        $("#rec-ok-" + uuid).removeClass("fa-check-circle-o");
+        $("#rec-ok-" + uuid).addClass("fa-times-circle-o");
+    });
+    socket.on('recDeleted', function(uuid) {
+        removeRecording(uuid);
+    });
+    socket.on('recordingFileRemoved', function(filename) {
+        removeRecordingFile(filename);
+    });
+    socket.on('recordedEnded', function(filename) {
+        endRecording(filename);
+    });
+    socket.on('newRecordingFile', function(file) {
+        addRecordingFile(file);
+    });
+</script>  
