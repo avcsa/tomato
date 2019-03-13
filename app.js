@@ -30,9 +30,10 @@ self.recFiles = [];
 
 //// VER QUE PASA CUANDO EL STREAM SE ACABA SIN INTERVENCION DEL USUARIO (STREAM Y RECORDINGS)
 
-var glob = new Glob({ gitignore: true });
+var glob = new Glob({ gitignore: false });
 
 var rf = glob.readdirSync(self.config.rec_dir + "/*");
+
 if (rf.length) {
     _.each(rf, function(file) {
         var f = {};
@@ -58,23 +59,25 @@ self.createNewRecording = function(callback) {
     recordx.format = record.format[0];
     recordx.enabled = record.enabled[0];
     recordx.uuid = uuidv4();
-    fs.writeFileSync('./record-' + self.maxRecording + '.json', JSON.stringify(recordx));
-    self.recordings.push(new SelfReloadJSON(__dirname + '/record-' + self.maxRecording + '.json'));
+    fs.writeFileSync('./record_' + self.maxRecording + '.json', JSON.stringify(recordx));
+    self.recordings.push(new SelfReloadJSON(__dirname + '/record_' + self.maxRecording + '.json'));
     if (callback)
         callback();
 };
 
-glob = new Glob({ gitignore: true });
+glob = new Glob({ gitignore: false });
 
-var files = glob.readdirSync('**/record-*.json');
+var files = glob.readdirSync('record_*.json');
 
 if (files.length === 0) {
+    console.log("No encontró recordings " + files.length);
     self.createNewRecording();
 } else {
+    console.log("Encontró " + files.length + " recordings");
     _.each(files, function(item) {
         var ext = item.indexOf('.json');
         var nr = parseInt(item.substring(7, ext++));
-        if (self.maxRecoring < nr);
+        if (self.maxRecording < nr);
             self.maxRecording = nr;
         self.recordings.push(new SelfReloadJSON(__dirname + '/' + item));
     });

@@ -4,5 +4,5 @@
     "rec_dir"        : "./recordings",
     "watch_interval" : 60000,
     "rec_timeout"    : 5000000,
-    "autostart"      : false
+    "autostart"      : true
 }
