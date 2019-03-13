@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
     res.render('indexview');
 });
 router.get('/downloads/:file(*)', function(req, res, next){ // this routes all types of file
-    console.log("sorete");
+    console.log("bajando");
     var path=require('path');
     var file = req.params.file;
     var dir = config.rec_dir.trim();

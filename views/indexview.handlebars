@@ -18,13 +18,14 @@
             </div>
         </div>
         <div class="row" style="margin-bottom:20px;">
+            <div id="success-message"></div>
             <div class="card">
                 <h3 class="card-header">Files</h3>
-                <div class="card-block" style="padding: 0.25rem;">
+                <div class="card-block" style="padding: 0.25rem;overflow-wrap:break-word;">
                     <ul class="list-group list-group-flush" id="recordingFiles">
                         {{#each files}}
                             <li class="list-group-item" style="padding: 3px 3px" data-key="{{this.filename}}">
-                                <div class="col-lg-8">
+                                <div class="col-lg-7">
                                     {{this.filename}}
                                 </div>
                                 <div class="col-lg-1">
@@ -59,6 +60,15 @@
                                         <a class="btn btn-default" style="padding: 0;border: 0;" href="/downloads/{{this.filename}}" aria-label="Download" id="btn-download-{{@index}} data-key="{{this.filename}}">
                                     {{/if}}
                                         <i class="fa fa-cloud-download" aria-hidden="true" id="icon-download-{{@index}}" data-key="{{this.filename}}"></i>
+                                    </a>
+                                </div>
+                                <div class="col-lg-1">
+                                    {{#if this.running}}
+                                        <a class="btn btn-default disabled" style="padding: 0;border: 0;" href="javascript:void(0)" aria-label="Copy" id="btn-copy-{{@index}}" data-key="{{this.filename}}">
+                                    {{else}}
+                                        <a class="btn btn-default" style="padding: 0;border: 0;" href="javascript:void(0)" aria-label="Copy" id="btn-copy-{{@index}} data-key="{{this.filename}}">
+                                    {{/if}}
+                                        <i class="fa fa-copy" aria-hidden="true" id="icon-copy-{{@index}}" data-key="{{this.filename}}"></i>
                                     </a>
                                 </div>
                             </li>
@@ -231,6 +241,10 @@
             deleteRecordingFile($("#" + event.target.id).attr('data-key'));
             return;
         }
+        if (event.target.id.startsWith('btn-copy') || event.target.id.startsWith('icon-copy')) {
+            copyRecordingFile($("#" + event.target.id).attr('data-key'));
+            return;
+        }
         if (event.target.id.startsWith('btn-download') || event.target.id.startsWith('icon-download')) {
             return;
         }
@@ -285,6 +299,17 @@
             }
         });
     };
+    function informFileCopied(filename) {
+        $('#success-message').empty();
+        $('#success-message').append(' \
+        <div class="alert alert-success alert-dismissible" style="width:100%"> \
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"> \
+            <span aria-hidden="true">&times;</span> \
+            </button> \
+            ' + "El archivo fue copiado correctamente a " + filename  + ' \
+        </div>');
+
+    }
     function endRecording(filename) {
         console.log(filename);
         $("#recordingFiles").children('li').each(function(i) { 
@@ -304,6 +329,8 @@
                             $(this).removeClass('disabled');
                         } else if ($(this).attr('id').startsWith('btn-play-')) {
                             $(this).removeClass('disabled');
+                        } else if ($(this).attr('id').startsWith('btn-copy-')) {
+                            $(this).removeClass('disabled');
                         }
                     }
                 });
@@ -313,7 +340,7 @@
     function addRecordingFile(file) {
         $("#recordingFiles").append(' \
             <li class="list-group-item" style="padding: 3px 3px" data-key="' + file.filename + '"> \
-                <div class="col-lg-8"> \
+                <div class="col-lg-7"> \
                     ' + file.filename + ' \
                 </div> \
                 <div class="col-lg-1"> \
@@ -332,6 +359,11 @@
                 <div class="col-lg-1"> \
                     <a class="btn btn-default disabled" style="padding: 0;border: 0;" href="javascript:void(0)" aria-label="Download" id="btn-download-' + file.uuid + '" data-key="' + file.filename + '"> \
                         <i class="fa fa-cloud-download" aria-hidden="true" id="icon-download-' + file.uuid + '" data-key="' + file.filename + '"></i> \
+                    </a> \
+                </div> \
+                <div class="col-lg-1"> \
+                    <a class="btn btn-default disabled" style="padding: 0;border: 0;" href="javascript:void(0)" aria-label="Copy" id="btn-copy-' + file.uuid + '" data-key="' + file.filename + '"> \
+                        <i class="fa fa-copy" aria-hidden="true" id="icon-copy-' + file.uuid + '" data-key="' + file.filename + '"></i> \
                     </a> \
                 </div> \
             </li>');

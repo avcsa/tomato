@@ -107,6 +107,9 @@
     function deleteRecordingFile(filename) {
         socket.emit("removeRecordingFile", filename);
     };
+    function copyRecordingFile(filename) {
+        socket.emit("copyRecordingFile", filename);
+    };
     socket.on('recStatusChanged', function(status) {
         if (status.running) {
             $("#rec-status-" + status.uuid).removeClass("card-danger");
@@ -132,6 +135,9 @@
     });
     socket.on('recordingFileRemoved', function(filename) {
         removeRecordingFile(filename);
+    });
+    socket.on('recordingFileCopied', function(filename) {
+        informFileCopied(filename);
     });
     socket.on('recordedEnded', function(filename) {
         endRecording(filename);

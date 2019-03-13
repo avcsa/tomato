@@ -231,6 +231,9 @@ io.on('connection', function(client) {
     client.on('removeRecordingFile', function(filename) {
         self.removeRecordingFile(filename);
     });
+    client.on('copyRecordingFile', function(filename) {
+        self.copyRecordingFile(filename);
+    });
 });
 
 self.startPlaying = function() {
@@ -314,7 +317,7 @@ self.startRecording = function(rec) {
         fs.mkdirSync(filename);
     if (!filename.endsWith('/'))
         filename = filename + '/' + rec.prefix.trim();;
-    filename = filename + moment().format('YYYYMMDDHHmmssSSSSSSSSS') + '.' + rec.format;
+    filename = filename + moment().format('YYYYMMDDHHmmssSSS') + '.' + rec.format;
     var params = ['-f', 'mpegts', '-i', 'udp://' + self.output.address + ':' + self.output.port + '?fifo_size=1000000&overrun_nonfatal=1&timeout=' + self.config.rec_timeout, '-strict', '-2'];
     if (rec.bitrate) {
         params.push('-b:v');
@@ -448,6 +451,19 @@ self.removeRecordingFile = function(filename) {
         dir = dir + '/';
     fs.unlinkSync(dir + filename);
     io.sockets.emit('recordingFileRemoved', filename);
+};
+
+self.copyRecordingFile = function(filename) {
+    var dirOrig = self.config.rec_dir.trim();
+    if (!dirOrig.endsWith('/'))
+        dirOrig = dirOrig + '/';
+    var dirDest = self.config.copy_to_dir.trim();
+    if (!dirDest.endsWith('/'))
+        dirDest = dirDest + '/';
+    fs.copyFile(dirOrig + filename, dirDest + filename, (err) => {
+        if (err) throw err;
+        io.sockets.emit('recordingFileCopied', dirDest + filename);
+    });
 };
 
 setInterval(function() {

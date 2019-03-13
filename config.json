@@ -4,5 +4,6 @@
     "rec_dir"        : "./recordings",
     "watch_interval" : 60000,
     "rec_timeout"    : 5000000,
-    "autostart"      : true
+    "autostart"      : true,
+    "copy_to_dir"    : "/home/jmrunge/Descargas"
 }
