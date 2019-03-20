@@ -1,4 +1,4 @@
-<!doctype html>  
+<!DOCTYPE HTML>
 <html lang="en">  
     <head>
         <link rel="apple-touch-icon" sizes="57x57" href="/static/img/favicon/apple-icon-57x57.png">
@@ -94,6 +94,12 @@
         else
             socket.emit("stopPlaying");
     });
+    function startRecording(recUuid) {
+        updateValue("record", "enabled", "yes", recUuid);
+    };
+    function stopRecording(recUuid) {
+        updateValue("record", "enabled", "no", recUuid);
+    };
     function updateValue(type, item, valor, uuid) {
         var obj = { "type": type, "item": item, "valor": valor, "uuid": uuid };
         socket.emit("updateValue", obj);

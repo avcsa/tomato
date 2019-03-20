@@ -281,15 +281,43 @@ self.startPlaying = function() {
         }
     }, 1000);
     self.startAllRecordings();
+    self.startPreview();
 };
 
 self.stopPlaying = function() {
     self.stopAllRecordings(function() {
-        console.log("Stopping stream with PID " + self.melt.pid);
-        self.melt.kill('SIGKILL');
-        clearInterval(self.interval);
-        self.interval = 0;
+        self.stopPreview(function() {
+            console.log("Stopping stream with PID " + self.melt.pid);
+            self.melt.kill('SIGKILL');
+            clearInterval(self.interval);
+            self.interval = 0;            
+        });
     });
+};
+
+self.startPreview = function() {
+    if (self.config.preview) {
+        self.vlc = spawn('cvlc', ['udp://@' + self.output.address + ':' + self.output.port, '--sout', 
+                    '#standard{access=http,mux=ts,dst=' + self.config.ipv4_address + ':' + self.config.preview_port + '}']);
+        console.log("Starting preview with PID " + self.vlc.pid);
+        self.vlc.stdout.on('data', function(data){
+            console.log("OUT:" + data);
+        });
+        self.vlc.stderr.on('data', function(data){
+            console.log("ERR:" + data);
+        });
+        self.vlc.on('close', function(code, signal){
+            console.log('Preview stopped with code ' + code + ' and signal ' + signal);
+        });
+    }
+};
+
+self.stopPreview = function(callback) {
+    if (self.config.preview) {
+        console.log("Stopping preview with PID " + self.vlc.pid);
+        self.vlc.kill('SIGKILL');
+    }
+    callback();
 };
 
 self.startAllRecordings = function() {

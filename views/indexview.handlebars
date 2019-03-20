@@ -1,3 +1,4 @@
+<div id="success-message" style="position:fixed;top:45%;left:20%;z-index:1000"></div>
 <div class="row" id="body">
     <div class="col-lg-5">
         <div class="row" style="margin-bottom:20px;">
@@ -18,7 +19,6 @@
             </div>
         </div>
         <div class="row" style="margin-bottom:20px;">
-            <div id="success-message"></div>
             <div class="card">
                 <h3 class="card-header">Files</h3>
                 <div class="card-block" style="padding: 0.25rem;overflow-wrap:break-word;">
@@ -106,20 +106,20 @@
                             </div>
                             <div class="col-lg-6" >
                                 {{#recordingRunning this.enabled}}
-                                    <div class="card card-inverse card-success mb-0 text-center" id="rec-status-{{this.uuid}}">
+                                    <div class="card card-inverse card-success mb-0 text-center status-card" id="rec-status-{{this.uuid}}" data-key="{{this.uuid}}">
                                         <div class="card-block" style="padding: 0.25rem;">
                                             <blockquote class="card-blockquote">
-                                                <span id="rec-status-text-{{this.uuid}}">Running</span>
-                                                <i class="fa fa-check-circle-o" aria-hidden="true" id="rec-ok-{{this.uuid}}"></i>
+                                                <span id="rec-status-text-{{this.uuid}}" data-key="{{this.uuid}}">Running</span>
+                                                <i class="fa fa-check-circle-o" aria-hidden="true" id="rec-ok-{{this.uuid}}" data-key="{{this.uuid}}"></i>
                                             </blockquote>
                                         </div>
                                     </div>
                                 {{else}}
-                                    <div class="card card-inverse card-danger mb-0 text-center" id="rec-status-{{this.uuid}}">
+                                <div class="card card-inverse card-danger mb-0 text-center status-card" id="rec-status-{{this.uuid}}" data-key="{{this.uuid}}">
                                         <div class="card-block" style="padding: 0.25rem;">
                                             <blockquote class="card-blockquote">
-                                                <span id="rec-status-text-{{this.uuid}}">Stopped</span>
-                                                <i class="fa fa-times-circle-o" aria-hidden="true" id="rec-ok-{{this.uuid}}"></i>
+                                                <span id="rec-status-text-{{this.uuid}}" data-key="{{this.uuid}}">Stopped</span>
+                                                <i class="fa fa-times-circle-o" aria-hidden="true" id="rec-ok-{{this.uuid}}" data-key="{{this.uuid}}"></i>
                                             </blockquote>
                                         </div>
                                     </div>
@@ -275,6 +275,26 @@
     $("#btn-add").click(function(event) {
         createNewRecording();
     });
+    $('.status-card').click(function(event) {
+        startStopRecording(event);
+    });
+    function startStopRecording(event) {
+        var id = event.target.id;
+        var elem = event.target;
+        if (!id) {
+            id = event.target.children[0].id;
+            elem = event.target.children[0];
+        }
+        if (!id) {
+            id = event.target.children[0].children[0].id;
+            elem = event.target.children[0].children[0];
+        }
+        //console.log("Event: " + id + " - " + elem.dataset.key + " - " + $("#val-enabled-" + elem.dataset.key).text());
+        if ($("#val-enabled-" + elem.dataset.key).text() === "no")
+            startRecording(elem.dataset.key);
+        else
+            stopRecording(elem.dataset.key);
+    };
     function updateData(data) {
         if (!data.uuid) {
             $("#val-" + data.item).text(data.valor);
@@ -378,11 +398,11 @@
                                     <h3>Recording</h3> \
                             </div> \
                             <div class="col-lg-6" > \
-                                <div class="card card-inverse card-danger mb-0 text-center" id="rec-status-' + data.uuid + '"> \
+                                <div class="card card-inverse card-danger mb-0 text-center status-card" id="rec-status-' + data.uuid + '" data-key="' + data.uuid + '"> \
                                     <div class="card-block" style="padding: 0.25rem;"> \
                                         <blockquote class="card-blockquote"> \
-                                            <span id="rec-status-text-' + data.uuid + '">Stopped</span> \
-                                            <i class="fa fa-times-circle-o" aria-hidden="true" id="rec-ok-' + data.uuid + '"></i> \
+                                            <span id="rec-status-text-' + data.uuid + '" data-key="' + data.uuid + '">Stopped</span> \
+                                            <i class="fa fa-times-circle-o" aria-hidden="true" id="rec-ok-' + data.uuid + '" data-key="' + data.uuid + '"></i> \
                                         </blockquote> \
                                     </div> \
                                 </div> \
@@ -421,6 +441,12 @@
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="icon-enabled' + data.uuid + '" data-key="enabled" data-type="record" data-uuid="' + data.uuid + '"></i> \
                                 </a> \
                             </li> \
+                            <li class="list-group-item" style="padding: 3px 3px" id="name"> \
+                                <b>name</b>&nbsp;<span id="val-name-' + data.uuid + '" >' + data.name + '</span> \
+                                <a class="btn btn-default" href="javascript:void(0)" aria-label="Edit" id="btn-name' + data.uuid + '" data-key="name" data-type="record" data-uuid="' + data.uuid + '"> \
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true" id="icon-name' + data.uuid + '" data-key="name" data-type="record" data-uuid="' + data.uuid + '"></i> \
+                                </a> \
+                            </li> \
                             <li class="list-group-item" style="padding: 3px 3px" id="uuid"> \
                                 <b>uuid:</b>&nbsp;<span id="val-uuid-' + data.uuid + '" >' + data.uuid + '</span> \
                             </li> \
@@ -431,5 +457,8 @@
                     </div> \
                 </div> \
             </div>');
+        $("#rec-status-" + data.uuid).click(function(event) {
+            startStopRecording(event);
+        });
     };
 </script>

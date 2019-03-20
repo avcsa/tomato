@@ -6,4 +6,6 @@
     "rec_timeout"    : 5000000,
     "autostart"      : true,
     "copy_to_dir"    : "/home/jmrunge/Descargas"
+    "preview"        : true,
+    "preview_port"   : "4444"
 }
